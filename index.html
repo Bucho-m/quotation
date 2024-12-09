@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studio Apartment Materials Estimator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        nav {
+            background-color: #333;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 1rem;
+        }
+        h1 {
+            text-align: center;
+            margin: 8% auto 2%;
+            font-size: 2rem;
+        }
+        .carousel {
+            display: flex;
+            overflow: hidden;
+            justify-content: center;
+            margin: 2% auto;
+        }
+        .carousel img {
+            width: 300px;
+            height: auto;
+            margin: 0 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .form-container {
+            width: 90%;
+            max-width: 600px;
+            margin: 2% auto;
+            padding: 1.5rem;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .form-container label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        .form-container input {
+            width: 100%;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .form-container button {
+            width: 100%;
+            padding: 0.7rem;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .form-container button:hover {
+            background-color: #555;
+        }
+        table {
+            width: 50%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #333;
+            color: white;
+        }
+        tr:hover {
+            background-color: lightgrey;
+        }
+        #download-button {
+            background-color: black;
+            color: white;
+            margin-top: 25px;
+            width: 150px;
+            height: 50px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            position: relative;
+            left: 45%; /* To align it towards the right bottom corner of the table */
+            margin-bottom: 50px;
+        }
+        #download-button:hover {
+            background-color: lightgrey;
+            color: darkgrey;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="#">Home</a>
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+    </nav>
+
+    <h1>Studio Apartment Materials Estimator</h1>
+
+
+    <!-- <div class="carousel">
+        <img src="example1.jpg" alt="Studio Apartment Design 1">
+        <img src="example2.jpg" alt="Studio Apartment Design 2">
+        <img src="example3.jpg" alt="Studio Apartment Design 3">
+    </div> -->
+
+    <div class="form-container">
+        <form id="estimator-form">
+            <label for="width">Width (m):</label>
+            <input type="number" id="width" name="width" required>
+
+            <label for="length">Length (m):</label>
+            <input type="number" id="length" name="length" required>
+
+            <button type="submit">Generate Materials Estimate</button>
+        </form>
+        <br>
+        <p id="sqm">sqm = __</p>
+        <p>Note: Door frames, window frames, and lintels will double in number every time the dimensions of the house double.</p>
+    </div>
+
+    <div id="materials-output" style="display:none;">
+        <h2 style="text-align: center;">Bachelor Pad/Single Room Material Estimate</h2>
+        <table id="materials-table">
+            <thead>
+                <tr>
+                    <th>Material</th>
+                    <th>Units</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <button id="download-button">Download Estimate as PDF</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script>
+        document.getElementById('estimator-form').addEventListener('submit', function(event){
+            event.preventDefault();
+
+            const width = parseFloat(document.getElementById('width').value);
+            const length = parseFloat(document.getElementById('length').value);
+            const area = 6*(width+length);
+            const sqm = width * length;
+            const blocks_m2 = 9.662;
+            const total_blocks = (area*blocks_m2)*1.5108;
+            const scale = sqm/16;
+
+            const materials = {
+                "Blocks/Bricks": Math.ceil(total_blocks),
+                "Bags of Cement": Math.ceil((total_blocks/44)*2.5),
+                "Loads of Rough Sand": Math.ceil(1 * scale),
+                "Loads of Fine Sand": Math.ceil(1 * scale),
+                "Lintels": Math.ceil(4 * scale),
+                "Rolls of Brick Force (6 inches)": Math.ceil(5 * scale),
+                "Roll of DPC (6 inches)": Math.ceil(1 * scale),
+                "Door Frames": Math.ceil(1 * scale),
+                "Window Frames": Math.ceil(2 * scale),
+                "Rafters (4.2m)": Math.ceil(5 * scale),
+                "Purlins (4.2m)": Math.ceil(5 * scale),
+                "IBR or Corrugated Iron Sheets": Math.ceil(5 * scale),
+                "5-inch Plain Nails (kg)": Math.ceil(1 * scale),
+                "Roofing Screws (kg)": Math.ceil(3 * scale),
+                "Plain Wire Bar (kg)": Math.ceil(5 * scale)
+            };
+
+            const tableBody = document.querySelector('#materials-table tbody');
+            tableBody.innerHTML = '';
+
+            for (const [material, units] of Object.entries(materials)) {
+                const row = document.createElement('tr');
+                const materialCell = document.createElement('td');
+                const unitsCell = document.createElement('td');
+                materialCell.textContent = material;
+                unitsCell.textContent = units;
+                row.appendChild(materialCell);
+                row.appendChild(unitsCell);
+                tableBody.appendChild(row);
+            }
+
+            document.getElementById('materials-output').style.display = 'block';
+            document.getElementById('sqm').innerHTML = "sqm = "+sqm;
+            document.getElementById('download-button').addEventListener('click', function() {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF();
+                pdf.text("Bachelor Pad/Single Room Material Estimate", 10, 10);
+
+                let rowIndex = 20;
+                for (const [material, units] of Object.entries(materials)) {
+                    pdf.text(`${material}: ${units}`, 10, rowIndex);
+                    rowIndex += 10;
+                }
+
+                pdf.save('Materials_Estimate.pdf');
+            });
+        });
+    </script>
+</body>
+</html>
