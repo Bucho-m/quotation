@@ -219,16 +219,7 @@
 
             document.getElementById('materials-output').style.display = 'block';
             document.getElementById('sqm').innerHTML = "sqm = "+sqm;
-            /*document.getElementById('download-button').addEventListener('click', function() {
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF();
-                pdf.text("Bachelor Pad/Single Room Material Estimate", 10, 10);
-
-                let rowIndex = 20;
-                for (const [material, units] of Object.entries(materials)) {
-                    pdf.text(`${material}: ${units}`, 10, rowIndex);
-                    rowIndex += 10;
-                }*/
+            
             document.getElementById('download-button').addEventListener('click', function() {
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF();
