@@ -13,6 +13,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Studio Apartment Materials Estimator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -218,7 +219,7 @@
 
             document.getElementById('materials-output').style.display = 'block';
             document.getElementById('sqm').innerHTML = "sqm = "+sqm;
-            document.getElementById('download-button').addEventListener('click', function() {
+            /*document.getElementById('download-button').addEventListener('click', function() {
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF();
                 pdf.text("Bachelor Pad/Single Room Material Estimate", 10, 10);
@@ -227,10 +228,38 @@
                 for (const [material, units] of Object.entries(materials)) {
                     pdf.text(`${material}: ${units}`, 10, rowIndex);
                     rowIndex += 10;
+                }*/
+            document.getElementById('download-button').addEventListener('click', function() {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF();
+            
+            // Add a title
+            pdf.text("Bachelor Pad/Single Room Material Estimate", 10, 10);
+        
+            // Target the table
+            const table = document.getElementById('materials-table');
+            
+            // Convert the table to PDF
+            pdf.autoTable({
+                html: table, // This automatically grabs table data
+                startY: 20,  // Positioning the table below the title
+                styles: {
+                    fontSize: 10, // Adjust font size for readability
+                    cellPadding: 3
+                },
+                headStyles: {
+                    fillColor: [51, 51, 51], // Set header background color
+                    textColor: [255, 255, 255] // Header text color
+                },
+                alternateRowStyles: {
+                    fillColor: [245, 245, 245] // Light grey for alternate rows
                 }
-
-                pdf.save('Materials_Estimate.pdf');
             });
+        
+            // Save the PDF
+            pdf.save('Materials_Estimate.pdf');
+        });
+
         });
     </script>
 </body>
